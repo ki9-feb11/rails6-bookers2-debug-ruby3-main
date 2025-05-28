@@ -1,5 +1,6 @@
 class BooksController < ApplicationController
-  before_action :is_matching_login_user, only: [:edit, :update]
+  before_action :authenticate_user!
+  before_action :is_matching_login_user, only: [:edit, :update, :destroy]
 
   def new
     @book = Book.new
@@ -42,7 +43,7 @@ class BooksController < ApplicationController
   def destroy
     @book = Book.find(params[:id])
     @book.destroy
-    redirect_to books_path
+    redirect_to books_path, notice: "successfully delete book!"
   end
 
   private
@@ -53,9 +54,8 @@ class BooksController < ApplicationController
 
   def is_matching_login_user
     book = Book.find(params[:id])
-    unless book.user.id == current_user.id
-      redirect_to books_path
+    unless book.user_id == current_user.id
+      redirect_to books_path, alert: "You are not authorized to access this page."
     end
   end
-
 end
